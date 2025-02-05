@@ -32,16 +32,15 @@ local moonspeak = {}
 --- @param content string
 --- @return moonspeak_script
 moonspeak.read = function(content)
-  local result, _ = read(content, "", 1)
+  local result, _ = read(content, "", 1, {})
   return result
 end
 
 
 -- implementation --
 
-read = function(content, indent, start_index)
+read = function(content, indent, start_index, nickname_map)
   local result = {}
-  local nickname_map = {}
 
   local is_in_header = start_index == 1
   if is_in_header then
@@ -80,10 +79,11 @@ read = function(content, indent, start_index)
       goto continue
     end
 
+    local last = result[#result]
+
     if line:sub(1, 1) == "!" then
       assert(line:sub(2, 2) == " ")
 
-      local last = result[#result]
       if last and last.type == "code" then
         last.description = last.description .. "\n" .. line:sub(3)
       else
@@ -98,9 +98,9 @@ read = function(content, indent, start_index)
     local i, j, n = line:find("(%d+). ")
     if i then
       local branch
-      branch, start_index = read(content, indent .. "  ", start_index)
+      branch, start_index = read(content, indent .. "  ", start_index, nickname_map)
 
-      if result[#result].type ~= "options" then
+      if not last or last.type ~= "options" then
         table.insert(result, {type = "options", options = {}})
       end
 
@@ -108,10 +108,28 @@ read = function(content, indent, start_index)
         text = line:sub(j + 1),
         branch = branch,
       }
+
+      goto continue
     end
 
-    -- TODO line
+    i, j = line:find(": ")
+    if i then
+      if not last or last.type ~= "lines" then
+        table.insert(result, {
+          type = "lines",
+          lines = {}
+        })
+      end
+
+      table.insert(result[#result].lines, {
+        source = nickname_map[line:sub(1, i - 1)],
+        text = line:sub(j + 1),
+      })
+      goto continue
+    end
+
     -- TODO unkown format error
+    -- TODO substitutions
 
     ::continue::
   end
