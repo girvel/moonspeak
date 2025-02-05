@@ -51,6 +51,7 @@ Or it should be just loaded in lua data structure:
 ```lua
 local screenplay = screenplayer.load("assets/sketches/screenplay-file.txt")
 assert.same(screenplay, {
+  {type = "code", desription = "Первая версия просто разделяет текст и код, позволяя решать две задачи:\n1. Переводить игру на другие языки\n2. Не надо копировать текст в скрипты"},
   {type = "lines", lines = {
     {source = "narrative", text = "Когда ты подходишь ближе, измазанный сажей полуэльф всё так же не оборачивается."},
     {source = "narrative", text = "Его глаза, не отрываясь, смотрят прямо на приборы."},
@@ -62,7 +63,7 @@ assert.same(screenplay, {
       {type = "lines", lines = {
         {source = "engineer_1", text = "Главный инженер"},
       }},
-      {type = "code", comment = "крутые спецэффекты"},
+      {type = "code", description = "крутые спецэффекты"},
       {type = "lines", lines = {
         {source = "engineer_1", text = "Моя работа — наблюдать за приборами"},
         {source = "engineer_1", text = "..."},
