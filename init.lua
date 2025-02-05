@@ -32,7 +32,8 @@ local moonspeak = {}
 --- @param content string
 --- @return moonspeak_script
 moonspeak.read = function(content)
-  return read(content, "", 1)
+  local result, _ = read(content, "", 1)
+  return result
 end
 
 
@@ -48,16 +49,26 @@ read = function(content, indent, start_index)
     start_index = 5
   end
 
-  while true do
+  while
+    start_index ~= #content
+    and content:sub(start_index, start_index + #indent - 1) == indent
+  do
+    start_index = start_index + #indent
+
     local end_of_line_i = content:find("\n", start_index)
-    if not end_of_line_i then break end
     if end_of_line_i == start_index then
       start_index = start_index + 1
       goto continue
     end
 
-    local line = content:sub(start_index, end_of_line_i - 1)
-    start_index = end_of_line_i + 1
+    local line
+    if end_of_line_i then
+      line = content:sub(start_index, end_of_line_i - 1)
+      start_index = end_of_line_i + 1
+    else
+      line = content:sub(start_index)
+      start_index = #content
+    end
 
     if is_in_header then
       if line == "---" then
@@ -84,10 +95,28 @@ read = function(content, indent, start_index)
       goto continue
     end
 
+    local i, j, n = line:find("(%d+). ")
+    if i then
+      local branch
+      branch, start_index = read(content, indent .. "  ", start_index)
+
+      if result[#result].type ~= "options" then
+        table.insert(result, {type = "options", options = {}})
+      end
+
+      result[#result].options[tonumber(n)] = {
+        text = line:sub(j + 1),
+        branch = branch,
+      }
+    end
+
+    -- TODO line
+    -- TODO unkown format error
+
     ::continue::
   end
 
-  return result
+  return result, start_index
 end
 
 return moonspeak
