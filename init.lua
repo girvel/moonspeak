@@ -32,27 +32,37 @@ local moonspeak = {}
 --- @param content string
 --- @return moonspeak_script
 moonspeak.read = function(content)
-  local result, _ = read(content, "", 1, {})
+  local result, _ = read(content, "", 1, {}, 0)
   return result
 end
 
 
 -- implementation --
 
-read = function(content, indent, start_index, nickname_map)
+
+local starts_with = function(str, substr, offset)
+  return str:sub(offset, offset + #substr - 1) == substr
+end
+
+read = function(content, indent, start_index, nickname_map, line_i)
   local result = {}
 
   local is_in_header = start_index == 1
   if is_in_header then
     assert(content:sub(1, 4) == "---\n")
     start_index = 5
+    line_i = line_i + 1
   end
 
-  while
-    start_index ~= #content
-    and content:sub(start_index, start_index + #indent - 1) == indent
-  do
-    start_index = start_index + #indent
+  while start_index ~= #content do
+    if starts_with(content, indent, start_index) then
+      start_index = start_index + #indent
+    elseif starts_with(content, "\n", start_index) then
+      start_index = start_index + 1
+      goto continue
+    else
+      break
+    end
 
     local end_of_line_i = content:find("\n", start_index)
     if end_of_line_i == start_index then
@@ -98,7 +108,7 @@ read = function(content, indent, start_index, nickname_map)
     local i, j, n = line:find("(%d+). ")
     if i then
       local branch
-      branch, start_index = read(content, indent .. "  ", start_index, nickname_map)
+      branch, start_index = read(content, indent .. "  ", start_index, nickname_map, line_i)
 
       if not last or last.type ~= "options" then
         table.insert(result, {type = "options", options = {}})
@@ -128,8 +138,7 @@ read = function(content, indent, start_index, nickname_map)
       goto continue
     end
 
-    -- TODO unkown format error
-    -- TODO substitutions
+    --error(("Unknown format at line %i"):format(line_i))
 
     ::continue::
   end
