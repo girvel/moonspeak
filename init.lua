@@ -32,7 +32,7 @@ local moonspeak = {}
 --- @param content string
 --- @return moonspeak_script
 moonspeak.read = function(content)
-  local result, _ = read(content, "", 1, {}, 0)
+  local result = read(content, "", 1, {}, 0)
   return result
 end
 
@@ -44,39 +44,39 @@ local starts_with = function(str, substr, offset)
   return str:sub(offset, offset + #substr - 1) == substr
 end
 
-read = function(content, indent, start_index, nickname_map, line_i)
+read = function(content, indent, offset, nickname_map, line_i)
   local result = {}
 
-  local is_in_header = start_index == 1
+  local is_in_header = offset == 1
   if is_in_header then
     assert(content:sub(1, 4) == "---\n")
-    start_index = 5
+    offset = 5
     line_i = line_i + 1
   end
 
-  while start_index ~= #content do
-    if starts_with(content, indent, start_index) then
-      start_index = start_index + #indent
-    elseif starts_with(content, "\n", start_index) then
-      start_index = start_index + 1
+  while offset ~= #content do
+    if starts_with(content, "\n", offset) then
+      offset = offset + 1
+      line_i = line_i + 1
       goto continue
+    elseif starts_with(content, indent, offset) then
+      offset = offset + #indent
     else
       break
     end
+    line_i = line_i + 1
 
-    local end_of_line_i = content:find("\n", start_index)
-    if end_of_line_i == start_index then
-      start_index = start_index + 1
-      goto continue
-    end
+    local end_of_line_i = content:find("\n", offset)
 
     local line
     if end_of_line_i then
-      line = content:sub(start_index, end_of_line_i - 1)
-      start_index = end_of_line_i + 1
+      line = content:sub(offset, end_of_line_i - 1)
+      offset = end_of_line_i + 1
+    elseif offset >= #content then
+      break
     else
-      line = content:sub(start_index)
-      start_index = #content
+      line = content:sub(offset)
+      offset = #content
     end
 
     if is_in_header then
@@ -108,7 +108,7 @@ read = function(content, indent, start_index, nickname_map, line_i)
     local i, j, n = line:find("(%d+). ")
     if i then
       local branch
-      branch, start_index = read(content, indent .. "  ", start_index, nickname_map, line_i)
+      branch, offset, line_i = read(content, indent .. "  ", offset, nickname_map, line_i)
 
       if not last or last.type ~= "options" then
         table.insert(result, {type = "options", options = {}})
@@ -138,12 +138,12 @@ read = function(content, indent, start_index, nickname_map, line_i)
       goto continue
     end
 
-    --error(("Unknown format at line %i"):format(line_i))
+    error(("Wrong syntax %q at line %s"):format(line, line_i))
 
     ::continue::
   end
 
-  return result, start_index
+  return result, offset, line_i
 end
 
 return moonspeak

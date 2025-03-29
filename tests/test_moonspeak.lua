@@ -1,14 +1,15 @@
 local moonspeak = require("init")
 
-it("Parses the sketch file", function()
-  local sketch_content
-  do
-    local f = assert(io.open("resources/sketch.ms", "r"))
-    sketch_content = f:read("*a")
-    f:close()
-  end
+local resource = function(path)
+  local f = assert(io.open("resources/" .. path, "r"))
+  local result = f:read("*a")
+  f:close()
+  return result
+end
 
-  local script = moonspeak.read(sketch_content)
+it("Parses the sketch file", function()
+  local script = moonspeak.read(resource("sketch.ms"))
+
   local expected = {
     {type = "code", description = "Первая версия просто разделяет текст и код, позволяя решать две задачи:\n1. Переводить игру на другие языки\n2. Не надо копировать текст в скрипты"},
     {type = "lines", lines = {
@@ -48,4 +49,10 @@ it("Parses the sketch file", function()
   }
 
   assert.are_same(expected, script)
+end)
+
+it("Detects invalid syntax", function()
+  local ok, res = pcall(moonspeak.read, resource("faulty_sketch.ms"))
+  assert.is_false(ok)
+  assert.is_truthy(res:find("at line 20"))
 end)
