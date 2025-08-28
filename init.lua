@@ -133,7 +133,6 @@ read = function(content, indent, offset, nickname_map, line_i)
     end
 
     if last and last.type == "code" then
-      print(line)
       last.description = last.description .. "\n" .. line
     else
       table.insert(result, {
