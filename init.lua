@@ -92,20 +92,14 @@ read = function(content, indent, offset, nickname_map, line_i)
     local last = result[#result]
 
     if line:sub(1, 1) == "!" then
-      assert(line:sub(2, 2) == " ")
+      local branch
+      branch, offset, line_i = read(content, indent .. "  ", offset, nickname_map, line_i)
 
-      if last and last.type == "code" then
-        last.description = last.description .. "\n" .. line:sub(3)
-      else
-        table.insert(result, {
-          type = "code",
-          description = line:sub(3)
-        })
-      end
+      table.insert(result, {type = "branch", text = line:sub(2), branch = branch})
       goto continue
     end
 
-    local i, j, n = line:find("(%d+). ")
+    local i, j, n = line:find("(%d+)%. ")
     if i then
       local branch
       branch, offset, line_i = read(content, indent .. "  ", offset, nickname_map, line_i)
@@ -138,7 +132,15 @@ read = function(content, indent, offset, nickname_map, line_i)
       goto continue
     end
 
-    error(("Wrong syntax %q at line %s"):format(line, line_i))
+    if last and last.type == "code" then
+      print(line)
+      last.description = last.description .. "\n" .. line
+    else
+      table.insert(result, {
+        type = "code",
+        description = line
+      })
+    end
 
     ::continue::
   end
