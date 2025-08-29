@@ -15,10 +15,11 @@
 --- @field text string
 
 --- @class moonspeak_options
---- @field type "moonspeak_options"
---- @field options moonspeak_option[]
+--- @field type "options"
+--- @field options moonspeak_branch[]
 
---- @class moonspeak_option
+--- @class moonspeak_branch
+--- @field type "branch"
 --- @field text string
 --- @field branch moonspeak_script
 
