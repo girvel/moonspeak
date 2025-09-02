@@ -2,7 +2,7 @@
 
 --- @alias moonspeak moonspeak_element[]
 
---- @alias moonspeak_element moonspeak_code | moonspeak_lines | moonspeak_options | moonspeak_branches
+--- @alias moonspeak_element moonspeak_code | moonspeak_lines | moonspeak_options | moonspeak_branches | moonspeak_literal
 
 --- @class moonspeak_code
 --- @field type "code"
@@ -28,6 +28,10 @@
 --- @field type "branch"
 --- @field text string
 --- @field branch moonspeak
+
+--- @class moonspeak_literal
+--- @field type "literal"
+--- @field text string
 
 
 -- API --
@@ -63,6 +67,7 @@ read = function(content, indent, offset, nickname_map, line_i)
     line_i = line_i + 1
   end
 
+  local is_in_literal = false
   while offset ~= #content do
     if starts_with(content, "\n", offset) then
       offset = offset + 1
@@ -99,6 +104,25 @@ read = function(content, indent, offset, nickname_map, line_i)
     end
 
     local last = result[#result]
+
+    if is_in_literal then
+      if line == '"""' then
+        is_in_literal = false
+      else
+        if last.text then
+          last.text = last.text .. "\n" .. line
+        else
+          last.text = line
+        end
+      end
+      goto continue
+    end
+
+    if line == '"""' then
+      is_in_literal = true
+      table.insert(result, {type = "literal"})
+      goto continue
+    end
 
     if line:sub(1, 1) == "!" then
       local branch

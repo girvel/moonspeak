@@ -34,6 +34,7 @@ it("Parses the sketch file", function()
         {type = "lines", lines = {
           {source = "engineer_1", text = "Бла-бла-бла"},
         }},
+        {type = "literal", text = "123123\n1212"},
       }},
 
       {text = "Бла-бла?", branch = {
