@@ -140,7 +140,7 @@ read = function(content, indent, offset, nickname_map, line_i)
 
       table.insert(result[#result].lines, {
         source = nickname_map[line:sub(1, i - 1)],
-        text = line:sub(j + 1):gsub(" -- ", " — "),
+        text = line:sub(j + 1):gsub(" %-%- ", " — "),
       })
       goto continue
     end
