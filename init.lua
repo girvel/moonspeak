@@ -51,6 +51,8 @@ local starts_with = function(str, substr, offset)
   return str:sub(offset, offset + #substr - 1) == substr
 end
 
+--- @param content string
+--- @param indent string
 read = function(content, indent, offset, nickname_map, line_i)
   local result = {}
 
@@ -138,7 +140,7 @@ read = function(content, indent, offset, nickname_map, line_i)
 
       table.insert(result[#result].lines, {
         source = nickname_map[line:sub(1, i - 1)],
-        text = line:sub(j + 1),
+        text = line:sub(j + 1):gsub(" -- ", " — "),
       })
       goto continue
     end
