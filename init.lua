@@ -1,6 +1,8 @@
 -- types --
 
---- @alias moonspeak_script (moonspeak_code | moonspeak_lines | moonspeak_options)[]
+--- @alias moonspeak moonspeak_element[]
+
+--- @alias moonspeak_element moonspeak_code | moonspeak_lines | moonspeak_options | moonspeak_branches
 
 --- @class moonspeak_code
 --- @field type "code"
@@ -18,10 +20,14 @@
 --- @field type "options"
 --- @field options moonspeak_branch[]
 
+--- @class moonspeak_branches
+--- @field type "branches"
+--- @field branches moonspeak_branch[]
+
 --- @class moonspeak_branch
 --- @field type "branch"
 --- @field text string
---- @field branch moonspeak_script
+--- @field branch moonspeak
 
 
 -- API --
@@ -31,7 +37,7 @@ local read
 local moonspeak = {}
 
 --- @param content string
---- @return moonspeak_script
+--- @return moonspeak
 moonspeak.read = function(content)
   local result = read(content, "", 1, {}, 0)
   return result
@@ -96,7 +102,11 @@ read = function(content, indent, offset, nickname_map, line_i)
       local branch
       branch, offset, line_i = read(content, indent .. "  ", offset, nickname_map, line_i)
 
-      table.insert(result, {type = "branch", text = line:sub(2), branch = branch})
+      if not last or last.type ~= "branches" then
+        table.insert(result, {type = "branches", branches = {}})
+      end
+
+      table.insert(result[#result].branches, {type = "branch", text = line:sub(2), branch = branch})
       goto continue
     end
 

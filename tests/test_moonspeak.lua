@@ -40,9 +40,16 @@ it("Parses the sketch file", function()
         {type = "lines", lines = {
           {source = "engineer_1", text = "Бла-бла"},
         }},
-        {type = "branch", text = "проверка", branch = {
-          {type = "lines", lines = {
-            {source = "engineer_1", text = "Бла-бла"},
+        {type = "branches", branches = {
+          {type = "branch", text = "проверка", branch = {
+            {type = "lines", lines = {
+              {source = "engineer_1", text = "Бла-бла"},
+            }},
+          }},
+          {type = "branch", text = "иначе", branch = {
+            {type = "lines", lines = {
+              {source = "engineer_1", text = "Бла-бла"},
+            }},
           }},
         }},
       }},
