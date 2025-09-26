@@ -165,8 +165,12 @@ read = function(content, indent, offset, nickname_map, line_i)
         })
       end
 
+      local nickname = line:sub(1, i - 1)
       table.insert(result[#result].lines, {
-        source = nickname_map[line:sub(1, i - 1)],
+        source = assert(
+          nickname_map[nickname],
+          ("Undefined character nickname %q"):format(nickname)
+        ),
         text = line:sub(j + 1):gsub(" %-%- ", " — "),
       })
       goto continue
