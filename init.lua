@@ -96,10 +96,10 @@ read = function(content, indent, offset, nickname_map, line_i)
       offset = #content
     end
 
-    assert(
-      line:sub(1, 1) ~= " ",
-      ("Wrong indentation in line %q"):format(line)
-    )
+    local _, _, extra_indent = line:find("^(%s+)")
+    if extra_indent then
+      error(("Wrong indentation %q in line %q"):format(extra_indent, line))
+    end
 
     if is_in_header then
       if line == "---" then
