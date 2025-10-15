@@ -161,7 +161,8 @@ read = function(content, indent, offset, nickname_map, line_i)
       goto continue
     end
 
-    i, j = line:find(": ")
+    local nickname
+    i, j, nickname = line:find("^(%S+): ")
     if i then
       if not last or last.type ~= "lines" then
         table.insert(result, {
@@ -170,7 +171,6 @@ read = function(content, indent, offset, nickname_map, line_i)
         })
       end
 
-      local nickname = line:sub(1, i - 1)
       table.insert(result[#result].lines, {
         source = assert(
           nickname_map[nickname],
