@@ -132,6 +132,10 @@ read = function(content, indent, offset, nickname_map, line_i)
       goto continue
     end
 
+    if line:sub(1, 1) == "\"" and line:sub(-1, -1) == "\"" then
+      table.insert(result, {type = "literal", text = line:sub(2, -2)})
+    end
+
     if line:sub(1, 1) == "!" then
       local branch
       branch, offset, line_i = read(content, indent .. "  ", offset, nickname_map, line_i)
