@@ -64,7 +64,7 @@ read = function(content, indent, offset, nickname_map, line_i)
   if is_in_header then
     assert(
       content:sub(1, 4) == "---\n",
-      ("Moonscript file should start with \"---\\n\", got %q instead"):format(content:sub(1, 4))
+      "Moonscript file should start with \"---\\n\""
     )
     offset = 5
     line_i = line_i + 1
