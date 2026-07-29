@@ -52,6 +52,7 @@ end
 
 
 local starts_with = function(str, substr, offset)
+  offset = offset or 0
   return str:sub(offset, offset + #substr - 1) == substr
 end
 
@@ -134,6 +135,7 @@ read = function(content, indent, offset, nickname_map, line_i)
 
     if line:sub(1, 1) == "\"" and line:sub(-1, -1) == "\"" then
       table.insert(result, {type = "literal", text = line:sub(2, -2)})
+      goto continue
     end
 
     if line:sub(1, 1) == "!" then
