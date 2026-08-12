@@ -99,7 +99,7 @@ read = function(content, indent, offset, nickname_map, line_i)
 
     local _, _, extra_indent = line:find("^(%s+)")
     if extra_indent then
-      error(("Wrong indentation %q in line %q"):format(extra_indent, line))
+      error(("Excessive indentation %q in line #%s %q"):format(extra_indent, line_i, line))
     end
 
     if is_in_header then
