@@ -97,8 +97,9 @@ read = function(content, indent, offset, nickname_map, line_i)
       offset = #content
     end
 
-    local _, _, extra_indent = line:find("^(%s+)")
+    local extra_indent = line:match("^%s+")
     if extra_indent then
+      if line:match("^%s+$") then goto continue end
       error(("Excessive indentation %q in line #%s %q"):format(extra_indent, line_i, line))
     end
 
