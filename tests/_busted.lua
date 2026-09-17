@@ -18,6 +18,10 @@ assert.is_false = function(it) end
 --- @param it nil
 assert.is_nil = function(it) end
 
+--- @param it any
+--- @param message string
+assert.is_not_nil = function(it, message) end
+
 --- @generic T
 --- @param expected T
 --- @param received T
